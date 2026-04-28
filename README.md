@@ -42,6 +42,16 @@ Download the latest public installer here:
 
 [Download ClipSpot.dmg](https://github.com/rumi7911/ClipSpot/raw/main/downloads/ClipSpot.dmg)
 
+## First Launch on macOS
+
+If macOS blocks the app on first launch because of Gatekeeper or quarantine attributes, remove the quarantine flag with:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/ClipSpot.app
+```
+
+Run that only after you have moved `ClipSpot.app` into `/Applications`.
+
 ## Project Structure
 
 ```text
