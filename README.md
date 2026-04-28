@@ -38,13 +38,9 @@ ClipSpot focuses on:
 
 ## Download
 
-Download the current installer here:
+Download the latest public installer here:
 
-[Download ClipSpot.dmg](https://github.com/rumi7911/ClipSpot/raw/main/downloads/ClipSpot.dmg)
-
-## Website
-
-The repository includes a standalone product landing page in [ClipSpotWebsite](/Users/rumipro/Documents/MacApps/ClipSpot/ClipSpotWebsite).
+[Download ClipSpot.dmg](https://github.com/rumi7911/ClipSpot/releases/latest/download/ClipSpot.dmg)
 
 ## Project Structure
 
@@ -52,9 +48,7 @@ The repository includes a standalone product landing page in [ClipSpotWebsite](/
 Sources/ClipboardShelf/     Swift source for the macOS app
 Tests/ClipboardShelfTests/  Unit tests
 assets/                     App branding assets
-downloads/                  Public installer artifacts tracked in git
 script/                     Local build and packaging scripts
-ClipSpotWebsite/            Static landing page
 ```
 
 ## Development
@@ -91,7 +85,7 @@ cd /Users/rumipro/Documents/MacApps/ClipSpot
 
 ## Notes
 
-- The repo tracks a downloadable DMG under `downloads/` so the website can link directly to a public installer.
+- Public downloads should be attached to GitHub Releases as `ClipSpot.dmg`.
 - The packaging script contains a fallback path for environments where mounted DMG creation is restricted.
 
 ## License
