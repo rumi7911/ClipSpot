@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ClipSpot is a modern clipboard archive for Mac that remembers text, images, videos, and file references locally.">
+    <title>ClipSpot - Clipboard archive for Mac</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <div class="grain"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="ClipSpot home">
+        <img src="assets/clipspot-logo.png" alt="" class="brand-mark">
+        <span>ClipSpot</span>
+      </a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="#features">Features</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#install">Install</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero section-shell">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Clipboard history for modern Mac workflows</p>
+          <h1>Your clipboard, organized into a private media archive.</h1>
+          <p class="hero-text">
+            ClipSpot keeps text, images, videos, and file references close at hand, without turning your clipboard into cloud data.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary magnetic" href="../ClipboardShelf/dist/ClipSpot.dmg">Download DMG</a>
+            <a class="button secondary magnetic" href="#features">See features</a>
+          </div>
+          <div class="hero-proof">
+            <span>Local-first</span>
+            <span>Media-aware</span>
+            <span>Menu bar native</span>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal" aria-label="ClipSpot app preview">
+          <div class="glass-stage">
+            <img src="assets/clipspot-logo.png" alt="ClipSpot app icon" class="app-icon">
+            <div class="clipboard-panel">
+              <div class="panel-top">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+              <div class="panel-title">Clipboard archive</div>
+              <div class="search-pill"></div>
+              <div class="clip-row active">
+                <div class="thumb image-thumb"></div>
+                <div>
+                  <strong>Launch assets</strong>
+                  <span>Image - just now</span>
+                </div>
+              </div>
+              <div class="clip-row">
+                <div class="thumb video-thumb"></div>
+                <div>
+                  <strong>Demo capture</strong>
+                  <span>Video reference</span>
+                </div>
+              </div>
+              <div class="clip-row">
+                <div class="thumb text-thumb"></div>
+                <div>
+                  <strong>Release notes</strong>
+                  <span>Text snippet</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-shell feature-grid" id="features" aria-labelledby="features-title">
+        <div class="section-heading reveal">
+          <p class="eyebrow">Built for real clipboard clutter</p>
+          <h2 id="features-title">More than copy and paste.</h2>
+        </div>
+        <article class="feature-card reveal">
+          <span class="card-number">01</span>
+          <h3>Text, images, videos, and files</h3>
+          <p>ClipSpot groups clipboard history by content type, so the thing you copied five minutes ago is not buried in a text-only list.</p>
+        </article>
+        <article class="feature-card reveal">
+          <span class="card-number">02</span>
+          <h3>Reference-aware media</h3>
+          <p>Media files stay as live file references. If the original disappears, ClipSpot tells you instead of pretending the file still exists.</p>
+        </article>
+        <article class="feature-card reveal">
+          <span class="card-number">03</span>
+          <h3>Fast keyboard flow</h3>
+          <p>Search, filter, move through visible clips, and copy back from the menu bar without breaking focus.</p>
+        </article>
+      </section>
+
+      <section class="privacy section-shell" id="privacy">
+        <div class="privacy-card reveal">
+          <p class="eyebrow">Private by design</p>
+          <h2>Your clipboard history stays on your Mac.</h2>
+          <p>
+            ClipSpot is designed for local workflows. It saves your archive locally and keeps media as references to files that already live on your machine.
+          </p>
+        </div>
+        <div class="privacy-list reveal">
+          <div>
+            <strong>No cloud archive</strong>
+            <span>Your clips are not synced to a remote account.</span>
+          </div>
+          <div>
+            <strong>Missing-file clarity</strong>
+            <span>Deleted media references are flagged clearly.</span>
+          </div>
+          <div>
+            <strong>Clean install flow</strong>
+            <span>Drag ClipSpot into Applications from the DMG.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="install section-shell" id="install">
+        <div class="install-window reveal">
+          <div class="window-bar">
+            <span class="traffic red"></span>
+            <span class="traffic yellow"></span>
+            <span class="traffic green"></span>
+            <span class="window-title">ClipSpot</span>
+          </div>
+          <div class="install-body">
+            <div class="install-item">
+              <img src="assets/clipspot-logo.png" alt="ClipSpot app icon">
+              <span>ClipSpot</span>
+            </div>
+            <div class="install-arrow" aria-hidden="true">-></div>
+            <div class="install-item folder">
+              <div class="folder-shape">A</div>
+              <span>Applications</span>
+            </div>
+          </div>
+        </div>
+        <div class="install-copy reveal">
+          <p class="eyebrow">Ready for your Mac</p>
+          <h2>Install with a simple drag.</h2>
+          <p>Download the DMG, open it, and drag ClipSpot into Applications.</p>
+          <a class="button primary magnetic" href="../ClipboardShelf/dist/ClipSpot.dmg">Download ClipSpot.dmg</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>ClipSpot</span>
+      <span>Local clipboard archive for macOS</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
