@@ -40,7 +40,7 @@ ClipSpot focuses on:
 
 Download the latest public installer here:
 
-[Download ClipSpot.dmg](https://github.com/rumi7911/ClipSpot/releases/latest/download/ClipSpot.dmg)
+[Download ClipSpot.dmg](https://github.com/rumi7911/ClipSpot/raw/main/downloads/ClipSpot.dmg)
 
 ## Project Structure
 
@@ -85,7 +85,7 @@ cd /Users/rumipro/Documents/MacApps/ClipSpot
 
 ## Notes
 
-- Public downloads should be attached to GitHub Releases as `ClipSpot.dmg`.
+- The repo tracks a public installer at `downloads/ClipSpot.dmg` for direct website downloads.
 - The packaging script contains a fallback path for environments where mounted DMG creation is restricted.
 
 ## License
