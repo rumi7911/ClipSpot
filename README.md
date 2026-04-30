@@ -106,4 +106,4 @@ cd /Users/rumipro/Documents/MacApps/ClipSpot
 
 ## License
 
-This project is available under the [MIT License](LICENSE).
+This project is available under a [personal-use-only, non-commercial license](LICENSE).
