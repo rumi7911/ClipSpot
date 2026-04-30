@@ -28,21 +28,21 @@ final class ClipboardStore: ObservableObject {
     private let persistenceService: ClipboardHistoryPersisting
     private let pasteboardWriter: PasteboardWriting
     private let fileManager: FileManager
-    private let historyLimit: Int
     private let now: () -> Date
+    private var settings: ClipSpotSettings
 
     init(
         persistenceService: ClipboardHistoryPersisting = PersistenceService(),
         pasteboardWriter: PasteboardWriting = SystemPasteboardWriter(),
         fileManager: FileManager = .default,
-        historyLimit: Int = 25,
+        settings: ClipSpotSettings = .default,
         now: @escaping () -> Date = Date.init,
         initialItems: [ClipboardItem] = []
     ) {
         self.persistenceService = persistenceService
         self.pasteboardWriter = pasteboardWriter
         self.fileManager = fileManager
-        self.historyLimit = historyLimit
+        self.settings = settings
         self.now = now
         self.items = initialItems
     }
@@ -70,13 +70,24 @@ final class ClipboardStore: ObservableObject {
             return
         }
 
-        guard items.first?.content != content else {
+        if settings.ignoreConsecutiveDuplicates,
+           items.first?.content == content {
             return
         }
 
         items.insert(ClipboardItem(content: content, capturedAt: now()), at: 0)
         trimHistoryIfNeeded()
         persistHistory()
+    }
+
+    func applySettings(_ settings: ClipSpotSettings) {
+        self.settings = settings
+        let originalCount = items.count
+        trimHistoryIfNeeded()
+
+        if items.count != originalCount {
+            persistHistory()
+        }
     }
 
     func copyItem(_ item: ClipboardItem) {
@@ -109,6 +120,17 @@ final class ClipboardStore: ObservableObject {
         persistHistory()
     }
 
+    func removeItem(_ item: ClipboardItem) {
+        let originalCount = items.count
+        items.removeAll { $0.id == item.id }
+
+        guard items.count != originalCount else {
+            return
+        }
+
+        persistHistory()
+    }
+
     var staleFileReferenceCount: Int {
         items.filter(isStaleFileReference(_:)).count
     }
@@ -136,11 +158,11 @@ final class ClipboardStore: ObservableObject {
     }
 
     private func trimHistoryIfNeeded() {
-        guard items.count > historyLimit else {
+        guard items.count > settings.historyLimit else {
             return
         }
 
-        items = Array(items.prefix(historyLimit))
+        items = Array(items.prefix(settings.historyLimit))
     }
 
     private func isStaleFileReference(_ item: ClipboardItem) -> Bool {

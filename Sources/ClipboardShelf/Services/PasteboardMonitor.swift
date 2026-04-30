@@ -78,6 +78,7 @@ final class PasteboardMonitor {
     private let pollInterval: TimeInterval
     private let makeTimer: (TimeInterval, @escaping () -> Void) -> TimerControlling
     private let onTextCaptured: CaptureHandler
+    private let shouldCapture: () -> Bool
 
     private var timer: TimerControlling?
     private var lastChangeCount: Int
@@ -86,11 +87,13 @@ final class PasteboardMonitor {
         pasteboard: PasteboardReading = SystemPasteboardClient(),
         pollInterval: TimeInterval = 0.75,
         makeTimer: @escaping (TimeInterval, @escaping () -> Void) -> TimerControlling = PasteboardMonitor.defaultTimer,
+        shouldCapture: @escaping () -> Bool = { true },
         onTextCaptured: @escaping CaptureHandler
     ) {
         self.pasteboard = pasteboard
         self.pollInterval = pollInterval
         self.makeTimer = makeTimer
+        self.shouldCapture = shouldCapture
         self.onTextCaptured = onTextCaptured
         self.lastChangeCount = pasteboard.changeCount
     }
@@ -118,6 +121,10 @@ final class PasteboardMonitor {
         }
 
         lastChangeCount = currentChangeCount
+
+        guard shouldCapture() else {
+            return
+        }
 
         let contents = pasteboard.capturedContents()
         guard contents.isEmpty == false else {

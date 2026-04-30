@@ -42,6 +42,12 @@ Download the latest public installer here:
 
 [Download ClipSpot.dmg](https://github.com/rumi7911/ClipSpot/raw/main/downloads/ClipSpot.dmg)
 
+## Latest Update
+
+Version `0.2.0` adds per-item delete, a dedicated settings window, configurable hotkeys, clipboard capture controls, excluded apps, and an updated installer.
+
+[Read release notes](CHANGELOG.md)
+
 ## First Launch on macOS
 
 If macOS blocks the app on first launch because of Gatekeeper or quarantine attributes, remove the quarantine flag with:

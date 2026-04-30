@@ -30,7 +30,7 @@ final class GlobalHotKey {
     }
 
     private func register(keyCode: UInt32, modifiers: UInt32) {
-        var hotKeyID = EventHotKeyID(signature: Self.signature, id: 1)
+        let hotKeyID = EventHotKeyID(signature: Self.signature, id: 1)
         var eventSpec = EventTypeSpec(
             eventClass: OSType(kEventClassKeyboard),
             eventKind: UInt32(kEventHotKeyPressed)
@@ -81,4 +81,15 @@ final class GlobalHotKey {
     }
 
     private static let signature: OSType = 0x43535048
+}
+
+extension GlobalHotKey {
+    static func make(from shortcut: HotKeyShortcut, onPressed: @escaping () -> Void) -> GlobalHotKey? {
+        guard let keyCode = shortcut.keyCode,
+              let modifiers = shortcut.modifiers else {
+            return nil
+        }
+
+        return GlobalHotKey(keyCode: keyCode, modifiers: modifiers, onPressed: onPressed)
+    }
 }

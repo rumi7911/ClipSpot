@@ -6,7 +6,10 @@ struct ClipboardShelfApp: App {
 
     var body: some Scene {
         Settings {
-            EmptyView()
+            ClipSpotSettingsView(
+                settingsStore: appDelegate.settingsStore,
+                store: appDelegate.store
+            )
         }
     }
 }

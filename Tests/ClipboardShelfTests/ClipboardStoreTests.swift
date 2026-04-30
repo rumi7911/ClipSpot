@@ -61,6 +61,22 @@ final class ClipboardStoreTests: XCTestCase {
         XCTAssertEqual(persistence.savedSnapshots.last, [])
     }
 
+    func testRemoveItemDeletesSingleEntryAndPersists() {
+        let persistence = PersistenceSpy()
+        let first = ClipboardItem(text: "One")
+        let second = ClipboardItem(text: "Two")
+        let store = ClipboardStore(
+            persistenceService: persistence,
+            pasteboardWriter: PasteboardWriterSpy(),
+            initialItems: [first, second]
+        )
+
+        store.removeItem(first)
+
+        XCTAssertEqual(store.items.map(\.text), ["Two"])
+        XCTAssertEqual(persistence.savedSnapshots.last?.map(\.text), ["Two"])
+    }
+
     func testFilteringItemsByQueryIsCaseInsensitive() {
         let store = ClipboardStore(
             persistenceService: PersistenceSpy(),
@@ -281,6 +297,43 @@ final class ClipboardStoreTests: XCTestCase {
 
         XCTAssertEqual(store.filteredItems(query: "project", contentFilter: .images).map(\.text), ["project.png"])
         XCTAssertEqual(store.filteredItems(query: "notes", contentFilter: .images).map(\.text), [])
+    }
+
+    func testApplySettingsTrimsExistingItemsToNewHistoryLimit() {
+        let persistence = PersistenceSpy()
+        let store = ClipboardStore(
+            persistenceService: persistence,
+            pasteboardWriter: PasteboardWriterSpy(),
+            initialItems: [
+                ClipboardItem(text: "One"),
+                ClipboardItem(text: "Two"),
+                ClipboardItem(text: "Three")
+            ]
+        )
+
+        var settings = ClipSpotSettings.default
+        settings.historyLimit = 2
+        store.applySettings(settings)
+
+        XCTAssertEqual(store.items.map(\.text), ["One", "Two"])
+        XCTAssertEqual(persistence.savedSnapshots.last?.map(\.text), ["One", "Two"])
+    }
+
+    func testDisablingDuplicateProtectionAllowsConsecutiveDuplicates() {
+        let persistence = PersistenceSpy()
+        var settings = ClipSpotSettings.default
+        settings.ignoreConsecutiveDuplicates = false
+        let store = ClipboardStore(
+            persistenceService: persistence,
+            pasteboardWriter: PasteboardWriterSpy(),
+            settings: settings,
+            initialItems: [ClipboardItem(text: "Repeat me", capturedAt: Date(timeIntervalSince1970: 1))]
+        )
+
+        store.handleCapturedText("Repeat me")
+
+        XCTAssertEqual(store.items.map(\.text), ["Repeat me", "Repeat me"])
+        XCTAssertEqual(persistence.savedSnapshots.last?.map(\.text), ["Repeat me", "Repeat me"])
     }
 
     private func makeTemporaryFile(name: String, file: StaticString = #filePath, line: UInt = #line) throws -> URL {

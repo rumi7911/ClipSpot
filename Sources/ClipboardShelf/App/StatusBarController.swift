@@ -6,14 +6,14 @@ final class StatusBarController: NSObject, NSPopoverDelegate {
     private let statusItem: NSStatusItem
     private let popover: NSPopover
 
-    init(store: ClipboardStore) {
+    init(store: ClipboardStore, settingsStore: SettingsStore) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         popover = NSPopover()
 
         super.init()
 
         configureStatusItem()
-        configurePopover(store: store)
+        configurePopover(store: store, settingsStore: settingsStore)
     }
 
     func togglePopoverFromHotKey() {
@@ -40,12 +40,12 @@ final class StatusBarController: NSObject, NSPopoverDelegate {
         button.action = #selector(togglePopover(_:))
     }
 
-    private func configurePopover(store: ClipboardStore) {
+    private func configurePopover(store: ClipboardStore, settingsStore: SettingsStore) {
         popover.behavior = .transient
         popover.contentSize = NSSize(width: 380, height: 470)
         popover.delegate = self
         popover.contentViewController = NSHostingController(
-            rootView: ClipboardShelfMenuView(store: store) { [weak self] in
+            rootView: ClipboardShelfMenuView(store: store, settingsStore: settingsStore) { [weak self] in
                 self?.closePopover()
             }
         )

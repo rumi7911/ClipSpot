@@ -6,10 +6,13 @@ struct ClipboardHistoryRow: View {
     let isFresh: Bool
     let isCopied: Bool
     let isSelected: Bool
+    let showsMediaPreview: Bool
     let onCopy: () -> Void
+    let onDelete: () -> Void
     let onRevealInFinder: ((URL) -> Void)?
     @State private var isHovered = false
     @State private var isRevealHovered = false
+    @State private var isDeleteHovered = false
 
     var body: some View {
         HStack(spacing: 0) {
@@ -29,7 +32,7 @@ struct ClipboardHistoryRow: View {
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            revealButton
+            trailingActions
                 .padding(.trailing, 10)
         }
         .background(
@@ -50,6 +53,7 @@ struct ClipboardHistoryRow: View {
         }
         .animation(.easeOut(duration: 0.16), value: isHovered)
         .animation(.easeOut(duration: 0.16), value: isRevealHovered)
+        .animation(.easeOut(duration: 0.16), value: isDeleteHovered)
         .animation(.easeOut(duration: 0.20), value: isCopied)
         .animation(.easeOut(duration: 0.20), value: isFresh)
         .help(item.text)
@@ -116,33 +120,47 @@ struct ClipboardHistoryRow: View {
         }
     }
 
-    @ViewBuilder
-    private var revealButton: some View {
-        if let revealURL = item.content.revealInFinderURL,
-           let onRevealInFinder {
-            Button {
-                onRevealInFinder(revealURL)
-            } label: {
-                Image(systemName: "folder")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(isRevealHovered ? ClipboardShelfTheme.accent : ClipboardShelfTheme.textTertiary)
-                    .frame(width: 28, height: 28)
-                    .background(
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .fill(isRevealHovered ? ClipboardShelfTheme.tileHoverGradient : ClipboardShelfTheme.tileGradient)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .stroke(isRevealHovered ? ClipboardShelfTheme.accent.opacity(0.7) : ClipboardShelfTheme.panelStroke, lineWidth: 1)
-                    )
-                    .shadow(color: isRevealHovered ? ClipboardShelfTheme.accent.opacity(0.22) : .clear, radius: 10)
+    private var trailingActions: some View {
+        HStack(spacing: 6) {
+            if let revealURL = item.content.revealInFinderURL,
+               let onRevealInFinder {
+                Button {
+                    onRevealInFinder(revealURL)
+                } label: {
+                    actionIcon(systemName: "folder", isHovered: isRevealHovered)
+                }
+                .buttonStyle(.plain)
+                .onHover { hovering in
+                    isRevealHovered = hovering
+                }
+                .help("Reveal in Finder")
+            }
+
+            Button(action: onDelete) {
+                actionIcon(systemName: "trash", isHovered: isDeleteHovered)
             }
             .buttonStyle(.plain)
             .onHover { hovering in
-                isRevealHovered = hovering
+                isDeleteHovered = hovering
             }
-            .help("Reveal in Finder")
+            .help("Remove from ClipSpot history")
         }
+    }
+
+    private func actionIcon(systemName: String, isHovered: Bool) -> some View {
+        Image(systemName: systemName)
+            .font(.system(size: 12, weight: .bold))
+            .foregroundStyle(isHovered ? ClipboardShelfTheme.accent : ClipboardShelfTheme.textTertiary)
+            .frame(width: 28, height: 28)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(isHovered ? ClipboardShelfTheme.tileHoverGradient : ClipboardShelfTheme.tileGradient)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .stroke(isHovered ? ClipboardShelfTheme.accent.opacity(0.7) : ClipboardShelfTheme.panelStroke, lineWidth: 1)
+            )
+            .shadow(color: isHovered ? ClipboardShelfTheme.accent.opacity(0.22) : .clear, radius: 10)
     }
 
     private var tileFill: LinearGradient {
@@ -163,7 +181,7 @@ struct ClipboardHistoryRow: View {
 
     @ViewBuilder
     private var leadingVisual: some View {
-        if let mediaPreview = item.content.mediaPreview {
+        if showsMediaPreview, let mediaPreview = item.content.mediaPreview {
             ClipboardMediaPreviewView(
                 preview: mediaPreview,
                 isEmphasized: isCopied || isFresh || isHovered || isSelected

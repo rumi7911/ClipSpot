@@ -76,6 +76,21 @@ final class PasteboardMonitorTests: XCTestCase {
 
         XCTAssertEqual(capturedContents, [.file(ClipboardFileReference(url: fileURL, kind: .image))])
     }
+
+    func testSkipsCaptureWhenCapturePolicyRejectsFrontmostApp() {
+        let pasteboard = PasteboardSpy(changeCount: 0, contents: [.text("Hidden text")])
+        var capturedContents: [ClipboardContent] = []
+        let monitor = PasteboardMonitor(
+            pasteboard: pasteboard,
+            makeTimer: { _, _ in TimerSpy() },
+            shouldCapture: { false }
+        ) { capturedContents.append(contentsOf: $0) }
+
+        pasteboard.changeCount = 1
+        monitor.poll()
+
+        XCTAssertTrue(capturedContents.isEmpty)
+    }
 }
 
 private final class PasteboardSpy: PasteboardReading {

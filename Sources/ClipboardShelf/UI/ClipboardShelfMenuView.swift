@@ -7,6 +7,7 @@ struct ClipboardShelfMenuView: View {
     }
 
     @ObservedObject var store: ClipboardStore
+    @ObservedObject var settingsStore: SettingsStore
     private let onRequestClose: () -> Void
     @State private var query = ""
     @State private var copiedItemID: ClipboardItem.ID?
@@ -15,13 +16,17 @@ struct ClipboardShelfMenuView: View {
     @State private var isClearHovered = false
     @State private var isExitHovered = false
     @State private var isCleanupHovered = false
+    @State private var isSettingsHovered = false
     @State private var keyDownMonitor: Any?
     @State private var selectedItemID: ClipboardItem.ID?
     @State private var selectedContentFilter: ClipboardContentFilter = .all
+    @State private var deleteCandidate: ClipboardItem?
+    @State private var showClearConfirmation = false
     @FocusState private var focusedField: FocusField?
 
-    init(store: ClipboardStore, onRequestClose: @escaping () -> Void = {}) {
+    init(store: ClipboardStore, settingsStore: SettingsStore, onRequestClose: @escaping () -> Void = {}) {
         _store = ObservedObject(wrappedValue: store)
+        _settingsStore = ObservedObject(wrappedValue: settingsStore)
         self.onRequestClose = onRequestClose
     }
 
@@ -97,6 +102,39 @@ struct ClipboardShelfMenuView: View {
         .onChange(of: visibleItemIDs) { _, _ in
             syncSelectionWithVisibleItems()
         }
+        .alert("Clear clipboard history?", isPresented: $showClearConfirmation) {
+            Button("Clear", role: .destructive) {
+                store.clearHistory()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes every saved item from ClipSpot history.")
+        }
+        .alert(
+            "Remove clipboard item?",
+            isPresented: Binding(
+                get: { deleteCandidate != nil },
+                set: { isPresented in
+                    if isPresented == false {
+                        deleteCandidate = nil
+                    }
+                }
+            ),
+            presenting: deleteCandidate
+        ) { item in
+            Button("Remove", role: .destructive) {
+                store.removeItem(item)
+                if selectedItemID == item.id {
+                    selectedItemID = nil
+                }
+                deleteCandidate = nil
+            }
+            Button("Cancel", role: .cancel) {
+                deleteCandidate = nil
+            }
+        } message: { item in
+            Text("Remove \"\(item.previewText)\" from ClipSpot history?")
+        }
     }
 
     private var header: some View {
@@ -162,7 +200,11 @@ struct ClipboardShelfMenuView: View {
             )
 
             Button {
-                store.clearHistory()
+                if settingsStore.settings.confirmBeforeClearingHistory {
+                    showClearConfirmation = true
+                } else {
+                    store.clearHistory()
+                }
             } label: {
                 Label("Clear", systemImage: "trash")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -285,9 +327,13 @@ struct ClipboardShelfMenuView: View {
                                 isFresh: item.id == freshItemID,
                                 isCopied: item.id == copiedItemID,
                                 isSelected: item.id == selectedItemID,
+                                showsMediaPreview: settingsStore.settings.showMediaPreviews,
                                 onCopy: {
                                     selectedItemID = item.id
                                     handleCopy(item)
+                                },
+                                onDelete: {
+                                    handleDelete(item)
                                 },
                                 onRevealInFinder: { url in
                                     revealInFinder(url)
@@ -428,6 +474,27 @@ struct ClipboardShelfMenuView: View {
 
     private var footer: some View {
         HStack {
+            Button {
+                openSettings()
+            } label: {
+                Label("Settings", systemImage: "gearshape")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(isSettingsHovered ? ClipboardShelfTheme.accent : ClipboardShelfTheme.textPrimary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+            }
+            .buttonStyle(.plain)
+            .background(buttonBackground(isHovered: isSettingsHovered))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isSettingsHovered ? ClipboardShelfTheme.accent.opacity(0.7) : ClipboardShelfTheme.panelStroke, lineWidth: 1)
+            )
+            .shadow(color: isSettingsHovered ? ClipboardShelfTheme.accent.opacity(0.28) : .clear, radius: 14)
+            .onHover { hovering in
+                isSettingsHovered = hovering
+            }
+            .animation(.easeOut(duration: 0.16), value: isSettingsHovered)
+
             Spacer()
 
             Button {
@@ -478,8 +545,24 @@ struct ClipboardShelfMenuView: View {
         scheduleCopiedReset(for: item.id)
     }
 
+    private func handleDelete(_ item: ClipboardItem) {
+        if settingsStore.settings.confirmBeforeDeletingItem {
+            deleteCandidate = item
+        } else {
+            store.removeItem(item)
+            if selectedItemID == item.id {
+                selectedItemID = nil
+            }
+        }
+    }
+
     private func revealInFinder(_ url: URL) {
         NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    private func openSettings() {
+        onRequestClose()
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
     private func scheduleCopiedReset(for itemID: ClipboardItem.ID) {
