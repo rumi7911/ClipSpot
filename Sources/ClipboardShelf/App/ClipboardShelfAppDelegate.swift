@@ -1,5 +1,6 @@
 import AppKit
 import Combine
+import SwiftUI
 
 @MainActor
 final class ClipboardShelfAppDelegate: NSObject, NSApplicationDelegate {
@@ -8,6 +9,7 @@ final class ClipboardShelfAppDelegate: NSObject, NSApplicationDelegate {
     private var monitor: PasteboardMonitor?
     private var statusBarController: StatusBarController?
     private var hotKey: GlobalHotKey?
+    private var settingsWindowController: NSWindowController?
     private let launchAtLoginController: LaunchAtLoginControlling
     private var settingsObserver: AnyCancellable?
 
@@ -37,7 +39,13 @@ final class ClipboardShelfAppDelegate: NSObject, NSApplicationDelegate {
         }
         updateMonitorState(initialLaunch: true)
 
-        statusBarController = StatusBarController(store: store, settingsStore: settingsStore)
+        statusBarController = StatusBarController(
+            store: store,
+            settingsStore: settingsStore,
+            onOpenSettings: { [weak self] in
+                self?.showSettingsWindow(nil)
+            }
+        )
         updateHotKey()
 
         settingsObserver = settingsStore.$settings
@@ -52,6 +60,21 @@ final class ClipboardShelfAppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         monitor?.stop()
+    }
+
+    @objc func showSettingsWindow(_ sender: Any?) {
+        let controller = makeSettingsWindowControllerIfNeeded()
+
+        if let hostingController = controller.contentViewController as? NSHostingController<ClipSpotSettingsView> {
+            hostingController.rootView = ClipSpotSettingsView(
+                settingsStore: settingsStore,
+                store: store
+            )
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
+        controller.showWindow(sender)
+        controller.window?.makeKeyAndOrderFront(sender)
     }
 
     private func updateHotKey() {
@@ -85,5 +108,34 @@ final class ClipboardShelfAppDelegate: NSObject, NSApplicationDelegate {
         } catch {
             settingsStore.setStatusMessage("Couldn't update launch at login.")
         }
+    }
+
+    private func makeSettingsWindowControllerIfNeeded() -> NSWindowController {
+        if let settingsWindowController {
+            return settingsWindowController
+        }
+
+        let hostingController = NSHostingController(
+            rootView: ClipSpotSettingsView(
+                settingsStore: settingsStore,
+                store: store
+            )
+        )
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 620, height: 560),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "ClipSpot Settings"
+        window.contentViewController = hostingController
+        window.center()
+        window.setFrameAutosaveName("ClipSpotSettingsWindow")
+        window.isReleasedWhenClosed = false
+
+        let controller = NSWindowController(window: window)
+        settingsWindowController = controller
+        return controller
     }
 }

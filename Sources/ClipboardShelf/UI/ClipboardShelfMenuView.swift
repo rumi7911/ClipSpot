@@ -9,6 +9,7 @@ struct ClipboardShelfMenuView: View {
     @ObservedObject var store: ClipboardStore
     @ObservedObject var settingsStore: SettingsStore
     private let onRequestClose: () -> Void
+    private let onOpenSettings: () -> Void
     @State private var query = ""
     @State private var copiedItemID: ClipboardItem.ID?
     @State private var freshItemID: ClipboardItem.ID?
@@ -24,10 +25,16 @@ struct ClipboardShelfMenuView: View {
     @State private var showClearConfirmation = false
     @FocusState private var focusedField: FocusField?
 
-    init(store: ClipboardStore, settingsStore: SettingsStore, onRequestClose: @escaping () -> Void = {}) {
+    init(
+        store: ClipboardStore,
+        settingsStore: SettingsStore,
+        onRequestClose: @escaping () -> Void = {},
+        onOpenSettings: @escaping () -> Void = {}
+    ) {
         _store = ObservedObject(wrappedValue: store)
         _settingsStore = ObservedObject(wrappedValue: settingsStore)
         self.onRequestClose = onRequestClose
+        self.onOpenSettings = onOpenSettings
     }
 
     private var visibleItems: [ClipboardItem] {
@@ -562,7 +569,7 @@ struct ClipboardShelfMenuView: View {
 
     private func openSettings() {
         onRequestClose()
-        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        onOpenSettings()
     }
 
     private func scheduleCopiedReset(for itemID: ClipboardItem.ID) {

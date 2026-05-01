@@ -5,10 +5,12 @@ import SwiftUI
 final class StatusBarController: NSObject, NSPopoverDelegate {
     private let statusItem: NSStatusItem
     private let popover: NSPopover
+    private let onOpenSettings: () -> Void
 
-    init(store: ClipboardStore, settingsStore: SettingsStore) {
+    init(store: ClipboardStore, settingsStore: SettingsStore, onOpenSettings: @escaping () -> Void) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         popover = NSPopover()
+        self.onOpenSettings = onOpenSettings
 
         super.init()
 
@@ -45,9 +47,14 @@ final class StatusBarController: NSObject, NSPopoverDelegate {
         popover.contentSize = NSSize(width: 380, height: 470)
         popover.delegate = self
         popover.contentViewController = NSHostingController(
-            rootView: ClipboardShelfMenuView(store: store, settingsStore: settingsStore) { [weak self] in
-                self?.closePopover()
-            }
+            rootView: ClipboardShelfMenuView(
+                store: store,
+                settingsStore: settingsStore,
+                onRequestClose: { [weak self] in
+                    self?.closePopover()
+                },
+                onOpenSettings: onOpenSettings
+            )
         )
     }
 
