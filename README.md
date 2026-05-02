@@ -44,7 +44,7 @@ Download the latest public installer here:
 
 ## Latest Update
 
-Version `0.2.0` adds per-item delete, a dedicated settings window, configurable hotkeys, clipboard capture controls, excluded apps, and an updated installer.
+Version `0.2.1` fixes the Settings button so it opens the dedicated preferences window reliably and refreshes the public installer.
 
 [Read release notes](CHANGELOG.md)
 

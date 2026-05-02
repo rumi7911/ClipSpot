@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.1 - 2026-05-02
+
+### Fixed
+
+- Restored the Settings button so it reliably opens the dedicated `ClipSpot Settings` window from the menu bar app
+
+### Changed
+
+- Repackaged the public DMG installer with the latest settings-window fix
+
 ## 0.2.0 - 2026-04-30
 
 ### Added
